@@ -18,3 +18,17 @@ def send_api_request_to_openai_api(messages, functions=None, function_call=None,
         return response
     except requests.RequestException as e:
         raise ConnectionError(f"Failed to connect to OpenAI API due to: {e}")
+
+def execute_function_call(function_name, arguments, api_key=OPENAI_API_KEY):
+    """Execute a function call based on provided function name and arguments."""
+    try:
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+        json_data = {
+            "function_name": function_name,
+            "arguments": arguments
+        }
+        response = requests.post("https://api.example.com/execute", headers=headers, json=json_data)
+        response.raise_for_status()
+        return response.json()  # Assuming the response is in JSON format
+    except requests.RequestException as e:
+        raise ConnectionError(f"Failed to execute function call due to: {e}")

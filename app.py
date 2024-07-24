@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.config import db_credentials, MAX_TOKENS_ALLOWED, MAX_MESSAGES_TO_OPENAI, TOKEN_BUFFER
+from utils.config import db_credentials, MAX_TOKENS_ALLOWED, MAX_MESSAGES_TO_OPENAI
 from utils.system_prompts import get_final_system_prompt
 from utils.chat_functions import run_chat_sequence, clear_chat_history, count_tokens, prepare_sidebar_data
 from utils.database_functions import database_schema_dict
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     ### CLEAR CONVERSATION BUTTON ###
     # Add a button to CLEAR the chat/conversation
     if st.sidebar.button("Clear Conversation🗑️"):
-        save_conversation(st.session_state["full_chat_history"]) 
+        save_conversation(st.session_state["full_chat_history"])
         clear_chat_history()
 
     ### TOGGLE THEME BUTTON ###
@@ -90,13 +90,13 @@ if __name__ == "__main__":
 
         # Limit the number of messages sent to OpenAI by token count
         total_tokens = sum(count_tokens(message["content"]) for message in st.session_state["api_chat_history"])
-        while total_tokens + count_tokens(prompt) + TOKEN_BUFFER > MAX_TOKENS_ALLOWED:
+        while total_tokens + count_tokens(prompt) > MAX_TOKENS_ALLOWED:
             removed_message = st.session_state["api_chat_history"].pop(0)
             total_tokens -= count_tokens(removed_message["content"])
 
         st.session_state.api_chat_history.append({"role": "user", "content": prompt})
 
-    # Display previous chat messages from full_chat_history (ingore system prompt message)
+    # Display previous chat messages from full_chat_history (ignore system prompt message)
     for message in st.session_state["full_chat_history"][1:]:
         if message["role"] == "user":
             st.chat_message("user", avatar='🧑‍💻').write(message["content"])
@@ -119,4 +119,6 @@ if __name__ == "__main__":
         max_tokens = MAX_TOKENS_ALLOWED
         current_tokens = total_tokens
         print(f"Current tokens used: {current_tokens} / {max_tokens}")
-        print(f"API token buffer set to: {TOKEN_BUFFER}")
+        print(db_credentials)
+        print(MAX_TOKENS_ALLOWED)
+        print(MAX_MESSAGES_TO_OPENAI)
